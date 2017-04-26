@@ -11,16 +11,18 @@ import edu.jalc.automobile.onlinebuilder.components.engine.sport.SportEngineAsse
 import edu.jalc.automobile.onlinebuilder.components.engine.sport.NaturallyAspiratedSportEngine;
 import edu.jalc.automobile.parts.induction.NaturallyAspiratedInduction;
 import edu.jalc.automobile.parts.exhaust.PerformanceExhaust;
-import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.engine.HemiVvtSportEngine;
-import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.engine.HemiMdsVvtSportEngine;
+import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.engine.HEMISportEngine;
+import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.engine.HemiMdsSportEngine;
 
 import edu.jalc.automobile.parts.body.*;
 import edu.jalc.automobile.parts.body.Paint;
 import edu.jalc.automobile.parts.body.seat.Seat;
+import edu.jalc.automobile.parts.body.seat.LeatherSeat;
 import edu.jalc.automobile.onlinebuilder.components.body.Body;
 import edu.jalc.automobile.onlinebuilder.components.body.car.CoupeBody;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.paint.*;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.seat.HighPerformanceSeat;
+import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.seat.SuedeNappaLeatherHighPerformanceSeat;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.color.Black;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.color.Red;
 
@@ -36,29 +38,27 @@ import edu.jalc.automobile.onlinebuilder.components.driveline.DriveLine;
 import edu.jalc.automobile.onlinebuilder.components.driveline.sport.SportRWD;
 import edu.jalc.automobile.parts.driveline.*;
 
-
-public class DodgeChallengerRTPlusShakerBuilder implements DodgeRamBuilderInterface{
-
-
-  public static void main(String[] args){
-    Automobile RTPlusShaker = new DodgeChallengerRTPlusShakerBuilder().askForPowerTrain().askForColorAndInterior().askForOptions().askForPackages().build();
-    System.out.println(RTPlusShaker);
-  }
+public class DodgeChallengerRTScatPackBuilder implements DodgeRamBuilderInterface{
 
   private SportEngineAssembly engine;
   private Body body;
   private Suspension suspension;
   private DriveLine driveline;
 
+  public static void main(String[] args){
+    Automobile RTScatPack = new DodgeChallengerRTScatPackBuilder().askForPowerTrain().askForColorAndInterior().askForOptions().askForPackages().build();
+    System.out.println(RTScatPack);
+  }
+
   public DodgeRamBuilderInterface askForPowerTrain(){
     TerminalPrompterBuilder powertrainPromptBuilder = TerminalPrompterBuilder.newBuilder();
-    SportEngine hemiVvtEngine = new HemiVvtSportEngine(5.7,new HorsePower(375,5200),new Torque(410,4200),8);
-    SportEngineAssembly vvt_Engine = new NaturallyAspiratedSportEngine(hemiVvtEngine, new PerformanceExhaust(), new NaturallyAspiratedInduction());
-    SportEngine hemiMdsVvtSportEngine = new HemiMdsVvtSportEngine(5.7,new HorsePower(375,5200),new Torque(410,4200),8);
-    SportEngineAssembly mds_Vvt_Engine = new NaturallyAspiratedSportEngine(hemiMdsVvtSportEngine, new PerformanceExhaust(), new NaturallyAspiratedInduction());
+    SportEngine hemiEngine = new HEMISportEngine(6.4,new HorsePower(375,5200),new Torque(410,4200),8);
+    SportEngineAssembly hemi_Engine = new NaturallyAspiratedSportEngine(hemiEngine, new PerformanceExhaust(), new NaturallyAspiratedInduction());
+    SportEngine hemiMdsSportEngine = new HemiMdsSportEngine(6.4,new HorsePower(375,5200),new Torque(410,4200),8);
+    SportEngineAssembly hemi_Mds_Engine = new NaturallyAspiratedSportEngine(hemiMdsSportEngine, new PerformanceExhaust(), new NaturallyAspiratedInduction());
     powertrainPromptBuilder.addType("Powertrain");
-    powertrainPromptBuilder.addOption(vvt_Engine);
-    powertrainPromptBuilder.addOption(mds_Vvt_Engine);
+    powertrainPromptBuilder.addOption(hemi_Engine);
+    powertrainPromptBuilder.addOption(hemi_Mds_Engine);
     int choice;
     try{
       choice = powertrainPromptBuilder.sort().build().ask();
@@ -69,6 +69,8 @@ public class DodgeChallengerRTPlusShakerBuilder implements DodgeRamBuilderInterf
     this.engine = (SportEngineAssembly)powertrainPromptBuilder.getOptions().get(choice -1);
     return this;
   }
+
+
 
   public DodgeRamBuilderInterface askForColorAndInterior(){
     TerminalPrompterBuilder paintPromptBuilder = TerminalPrompterBuilder.newBuilder();
@@ -130,7 +132,7 @@ public class DodgeChallengerRTPlusShakerBuilder implements DodgeRamBuilderInterf
       wheelPromptBuilder.addType("Wheels");
       wheelPromptBuilder.addOption(wheel);
       try{
-        wheelPromptBuilder.build().tell("The R/T Plus Shaker model Dodge Challenger ships with "+wheel+" wheels by default");
+        wheelPromptBuilder.build().tell("The R/T ScatPack model Dodge Challenger ships with "+wheel+" wheels by default");
       }
       catch(Exception except){}
 
@@ -139,7 +141,7 @@ public class DodgeChallengerRTPlusShakerBuilder implements DodgeRamBuilderInterf
       tirePromptBuilder.addType("Tires");
       tirePromptBuilder.addOption(tire);
       try{
-        tirePromptBuilder.build().tell("The R/T Plus Shaker model Dodge Challenger ships with "+tire+" tires by default");
+        tirePromptBuilder.build().tell("The R/T ScatPack model Dodge Challenger ships with "+tire+" tires by default");
       }
       catch(Exception except){}
 
@@ -156,7 +158,7 @@ public class DodgeChallengerRTPlusShakerBuilder implements DodgeRamBuilderInterf
 
       DriveLine driveline = new SportRWD(new FrontDeadAxle(),new RearDriveAxle(),new DriveShaft(),new HydraulicSteering(),new TorqueVectorDifferential());
 
-      return new Automobile("Dodge","Challenger","R/T Plus Shaker",body,driveline,engine,suspension);
+      return new Automobile("Dodge","Challenger","ScatPack",body,driveline,engine,suspension);
     }
 
 }
