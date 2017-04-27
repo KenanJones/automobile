@@ -22,6 +22,7 @@ import edu.jalc.automobile.onlinebuilder.components.body.Body;
 import edu.jalc.automobile.onlinebuilder.components.body.car.CoupeBody;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.paint.*;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.seat.HighPerformanceSeat;
+import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.seat.ClothBucketSeat;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.seat.SuedeNappaLeatherHighPerformanceSeat;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.color.Black;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.color.Red;
@@ -30,8 +31,7 @@ import edu.jalc.automobile.parts.suspension.*;
 import edu.jalc.automobile.onlinebuilder.components.suspension.Suspension;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.suspension.SportSuspension;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.wheel.AluminumForgedWheel;
-import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.tire.AllSeasonPerformanceTire;
-import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.tire.ThreeSeasonPerformanceTire;
+import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.tire.*;
 import edu.jalc.automobile.onlinebuilder.builders.dodgeram.challenger.parts.brake.*;
 
 import edu.jalc.automobile.onlinebuilder.components.driveline.DriveLine;
@@ -52,7 +52,7 @@ public class DodgeChallengerRTScatPackBuilder implements DodgeRamBuilderInterfac
 
   public DodgeRamBuilderInterface askForPowerTrain(){
     TerminalPrompterBuilder powertrainPromptBuilder = TerminalPrompterBuilder.newBuilder();
-    SportEngine hemiEngine = new HEMISportEngine(6.4,new HorsePower(375,5200),new Torque(410,4200),8);
+    SportEngine hemiEngine = new HEMISportEngine(6.4,new HorsePower(485,5200),new Torque(475,4200),8);
     SportEngineAssembly hemi_Engine = new NaturallyAspiratedSportEngine(hemiEngine, new PerformanceExhaust(), new NaturallyAspiratedInduction());
     SportEngine hemiMdsSportEngine = new HemiMdsSportEngine(6.4,new HorsePower(375,5200),new Torque(410,4200),8);
     SportEngineAssembly hemi_Mds_Engine = new NaturallyAspiratedSportEngine(hemiMdsSportEngine, new PerformanceExhaust(), new NaturallyAspiratedInduction());
@@ -92,21 +92,26 @@ public class DodgeChallengerRTScatPackBuilder implements DodgeRamBuilderInterfac
     Paint paint = (Paint)paintPromptBuilder.getOptions().get(choice - 1);
 
 
-    TerminalPrompterBuilder seatPromptBuilder = TerminalPrompterBuilder.newBuilder();
+    TerminalPrompterBuilder cabinPromptBuilder = TerminalPrompterBuilder.newBuilder();
     HighPerformanceSeat blackSuedeSeat = new HighPerformanceSeat(new Black(),"Suede/Nappa Performance Seat");
     HighPerformanceSeat redSuedeSeat = new HighPerformanceSeat(new Red(),"Suede/Nappa Performance Seat");
-    seatPromptBuilder.addType("Seat");
-    seatPromptBuilder.addOption(blackSuedeSeat);
-    seatPromptBuilder.addOption(redSuedeSeat);
-    int seatChoice;
+    ClothBucketSeat clothSeat = new ClothBucketSeat("Black (With Logo)");
+    LuxuryCabin blackSuede_Seat = new LuxuryCabin(blackSuedeSeat);
+    LuxuryCabin redSuede_Seat = new LuxuryCabin(redSuedeSeat);
+    StandardCabin cloth_Seat = new StandardCabin(clothSeat);
+    cabinPromptBuilder.addType("Seat");
+    cabinPromptBuilder.addOption(blackSuede_Seat);
+    cabinPromptBuilder.addOption(redSuede_Seat);
+    cabinPromptBuilder.addOption(cloth_Seat);
+    int cabinChoice;
     try{
-      seatChoice = seatPromptBuilder.sort().build().ask();
+      cabinChoice = cabinPromptBuilder.sort().build().ask();
     }
     catch(Exception except){
-      seatChoice = 0;
+      cabinChoice = 0;
     }
 
-    HighPerformanceSeat seat = (HighPerformanceSeat)seatPromptBuilder.getOptions().get(seatChoice - 1);
+    Cabin cabin = (Cabin)cabinPromptBuilder.getOptions().get(cabinChoice - 1);
 
     TerminalPrompterBuilder graphicPromptBuilder = TerminalPrompterBuilder.newBuilder();
     graphicPromptBuilder.addType("Graphic");
@@ -120,30 +125,40 @@ public class DodgeChallengerRTScatPackBuilder implements DodgeRamBuilderInterfac
       graphicChoice = 0;
     }
     Graphic graphic = (Graphic)graphicPromptBuilder.getOptions().get(graphicChoice - 1);
-    this.body = new CoupeBody(new Quarterpanels(paint,graphic),new EngineCompartment(new Hood(paint,graphic)),new LuxuryCabin(seat),new StandardTrunk(5));
+    this.body = new CoupeBody(new Quarterpanels(paint,graphic),new EngineCompartment(new Hood(paint,graphic)),cabin,new StandardTrunk(5));
 
     return this;
     }
 
     public DodgeRamBuilderInterface askForOptions(){
 
-      AluminumForgedWheel wheel = new AluminumForgedWheel(20,9,"Hyper Black II");
       TerminalPrompterBuilder wheelPromptBuilder = TerminalPrompterBuilder.newBuilder();
       wheelPromptBuilder.addType("Wheels");
-      wheelPromptBuilder.addOption(wheel);
+      wheelPromptBuilder.addOption(new AluminumForgedWheel(20,9,"Hyper Black II"));
+      wheelPromptBuilder.addOption(new AluminumForgedWheel(20,9.5,"Low Gloss Black"));
+      int choice;
       try{
-        wheelPromptBuilder.build().tell("The R/T ScatPack model Dodge Challenger ships with "+wheel+" wheels by default");
+        choice = wheelPromptBuilder.sort().build().ask();
       }
-      catch(Exception except){}
+      catch(Exception except){
+        choice = 0;
+      }
+      ForgedWheel wheel = (ForgedWheel)wheelPromptBuilder.getOptions().get(choice - 1);
 
-      AllSeasonPerformanceTire tire = new AllSeasonPerformanceTire(20,245,"245/45ZR20");
       TerminalPrompterBuilder tirePromptBuilder = TerminalPrompterBuilder.newBuilder();
       tirePromptBuilder.addType("Tires");
-      tirePromptBuilder.addOption(tire);
+      tirePromptBuilder.addOption(new AllSeasonPerformanceTire(20,245,"245/45ZR20"));
+      tirePromptBuilder.addOption(new AllSeasonPerformanceTire(20,275,"275/40ZR20"));
+      tirePromptBuilder.addOption(new ThreeSeasonPerformanceTire(20,255,"255/45ZR20"));
+      tirePromptBuilder.addOption(new PZeroSummerTire(20,275,"275/40ZR20"));
+      int tireChoice;
       try{
-        tirePromptBuilder.build().tell("The R/T ScatPack model Dodge Challenger ships with "+tire+" tires by default");
+        tireChoice = tirePromptBuilder.sort().build().ask();
       }
-      catch(Exception except){}
+      catch(Exception except){
+        tireChoice = 0;
+      }
+      SportTire tire = (SportTire)tirePromptBuilder.getOptions().get(tireChoice - 1);
 
       this.suspension = new SportSuspension(new StockShock(12),new MediumSpring(12),tire,wheel);
 
