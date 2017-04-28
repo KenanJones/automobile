@@ -156,7 +156,7 @@ public class DodgeChallengerRTPlusShakerBuilder implements DodgeRamBuilderInterf
 
       DriveLine driveline = new SportRWD(new FrontDeadAxle(),new RearDriveAxle(),new DriveShaft(),new HydraulicSteering(),new TorqueVectorDifferential());
 
-      return new Automobile("Dodge","Challenger","T/A Plus",body,driveline,engine,suspension);
+      return new Automobile("Dodge","Challenger","R/T Plus Shaker",body,driveline,engine,suspension);
     }
 
 }
